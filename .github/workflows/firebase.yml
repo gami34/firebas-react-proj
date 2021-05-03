@@ -16,17 +16,17 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [14.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install -g yarn
-    - name: yarn install, build and  test
+    - name: yarn install, build and test
       run: |
         yarn install
         yarn build
@@ -35,21 +35,21 @@ jobs:
       with:
         name: build
         path: build
-       
-deploy:
-  name: Deploy
-  needs: build
-  runs-on: ubuntu-latest
-  steps: |
-    - uses: actions/checkout@v2
-    - name: Download Build
-      uses: actions/download-artifact@v2
-      with:
-        name: build
-        path: build
-    - name: Deploy to firebase
-      uses: w9jds/firebase-action@master
-      with:
-        args: deploy --only-hosting
-      env:
-        FIREBASE_TOKEN: ${{secrets.FIREBASE_TOKEN}}
+        
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download Build
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: build
+      - name: Depoy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
